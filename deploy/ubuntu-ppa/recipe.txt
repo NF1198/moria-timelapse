@@ -1,0 +1,3 @@
+# git-build-recipe format 0.4 deb-version {debupstream}+{revno}
+lp:moria-timelapse
+nest-part packaging lp:moria-timelapse deploy/ubuntu-ppa/debian debian master

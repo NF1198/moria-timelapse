@@ -1,0 +1,17 @@
+Source: moria-timelapse
+Section: misc
+Priority: optional
+Maintainer: Nicholas Folse <nickfolse@gmail.com>
+Build-Depends: build-essential, cmake, opencv-dev, doxygen, graphviz
+Standards-Version: 3.8.0
+
+Package: moria-timelapse
+Architecture: any
+Depends: opencv
+Homepage: https://github.com/nf1198/moria-timelapse
+Description: Timelapse recording utility
+
+Package: moria-timelapse-docs
+Architecture: any
+Homepage: https://github.com/nf1198/moria-timelapse
+Description: Timelapse recording utility
