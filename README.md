@@ -20,6 +20,8 @@ Use `v4l2-ctl --list-formats-ext --device=<>` to discover stream formats availab
 
 Use `gst-launch-1.0` to test [gstreamer](https://gstreamer.freedesktop.org/documentation/video4linux2/v4l2src.html) pipelines. 
 
+If your gstreamer pipeline fails, make sure to install the appropriate gstreamer-plugin-dev libraries before building opencv. The pipelines should work after rebuildling opencv with the requisite libraries.
+
 # Usage
 
 ```
