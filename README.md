@@ -52,6 +52,11 @@ Configuration:
   -O [ --output ] arg         output directory
   --utc arg (=0)              use UTC timestamps
   --timestamp arg (=1)        write timestamp in frame
+  -f [ --flip ] arg (=0)      flip frame {0: no flip, 1: horizontal, 2: 
+                              vertical, 3: both}
+  --noGUI                     don't show the GUI
+  --decimate arg (=1)         only capture 1:N frames (useful if framerate is 
+                              set by camera)
   -v [ --verbose ]            verbose output
 ```
 
