@@ -12,7 +12,7 @@ For example, you can capture images from a camera at 15 fps, apply a filter peri
 
 ### Tips
 
-Filter results are limited by floating point rounding errors. Excessively high frame rates can result in 
+Filter results depend on floating point rounding errors. Excessively high frame rates can result in 
 an unstable image due to high gain in the image filter. Run moria with the `--verbose` option to reveal
 the gain used in the filter calculation. Gains of less than 20,000 should result in relativley stable filter operation.
 
