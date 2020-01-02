@@ -13,7 +13,7 @@ temporally low-pass filtered. Images are then saved at a user-defined interval.
 ```
 $ moria --help
 ================================================
-moria-timelapse v0.1.0 (aa626f380772)
+moria-timelapse
 Timelapse recording utility
 ================================================
 
