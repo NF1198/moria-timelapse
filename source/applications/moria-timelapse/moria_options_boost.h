@@ -34,6 +34,9 @@ private:
   bool useUTC_;
   bool writeTimestamp_;
   bool verbose_;
+  u_int flip_;
+  bool noGUI_;
+  u_int decimate_;
 
 public:
   virtual int deviceID();
@@ -51,6 +54,9 @@ public:
   virtual bool useUTCtime();
   virtual bool writeTimestampInImage();
   virtual bool verbose();
+  virtual u_int flip();
+  virtual bool noGUI();
+  virtual u_int decimate();
 
   MoriaOptionsBoost(int argc, char *argv[]);
   virtual ~MoriaOptionsBoost();

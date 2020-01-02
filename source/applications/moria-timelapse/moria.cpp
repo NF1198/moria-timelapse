@@ -20,6 +20,7 @@
 #include "IntervalTimer.h"
 #include "butterworth_2nd_IIR_params.hpp"
 #include "util.h"
+#include <algorithm>
 #include <cmath>
 #include <ctime>
 #include <functional>
@@ -50,6 +51,9 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
   bool writeTimestampInImage = options->writeTimestampInImage();
   std::string outDir = options->outDir();
   bool verbose = options->verbose();
+  u_int flip = std::min(3u, std::max(0u, options->flip()));
+  bool noGUI = options->noGUI();
+  u_int decimate = std::max(1u, options->decimate());
 
   // font for time text
   int fontFace = cv::FONT_HERSHEY_PLAIN;
@@ -58,15 +62,18 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
 
   // print usage info
   print_version();
-  std::cout << "Press 'q' key to exit" << ENDL;
-  std::cout << "Press 'f' key to toggle FPS display" << ENDL;
-  std::cout << "Press 'c' key to toggle FPS change display" << ENDL;
-  std::cout << "Press 'r' key to reset frame" << ENDL;
-  std::cout << "Press 't' key to toggle timestamp" << ENDL;
-  std::cout << "Press 'u' key to toggle UTC timestamp" << ENDL;
-  std::cout << "Press 'v' key to toggle verbose display" << ENDL;
-  std::cout << "Press '[' key to decrease filter period" << ENDL;
-  std::cout << "Press ']' key to increase filter period" << ENDL;
+  if (!noGUI) {
+    std::cout << "Press 'q' key to exit" << ENDL;
+    std::cout << "Press 'f' key to toggle FPS display" << ENDL;
+    std::cout << "Press 'c' key to toggle FPS change display" << ENDL;
+    std::cout << "Press 'r' key to reset frame" << ENDL;
+    std::cout << "Press 't' key to toggle timestamp" << ENDL;
+    std::cout << "Press 'u' key to toggle UTC timestamp" << ENDL;
+    std::cout << "Press 'v' key to toggle verbose display" << ENDL;
+    std::cout << "Press '[' key to decrease filter period" << ENDL;
+    std::cout << "Press ']' key to increase filter period" << ENDL;
+  }
+
   if (!options->recordImages()) {
     std::cerr << ENDL;
     std::cerr
@@ -201,9 +208,17 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
       }};
 
   int empty_frames = 0;
+  int decimate_counter = decimate;
 
   //--- GRAB AND WRITE LOOP
   cap.with_frames([&](cv::Mat &frame) {
+    decimate_counter--;
+    if (decimate_counter > 0) {
+      return true; // continue capture
+    } else {
+      decimate_counter = decimate;
+    }
+    
     if (frame.empty()) {
       if (verbose) {
         std::cerr << "Empty frame!\n";
@@ -218,6 +233,22 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
     fpscounter.update();
     fps_printer.update();
     fpsChangeDetector.update();
+
+    if (flip) {
+      switch (flip) {
+      case 1:
+        cv::flip(frame, frame, 1);
+        break;
+      case 2:
+        cv::flip(frame, frame, 0);
+        break;
+      case 3:
+        cv::flip(frame, frame, -1);
+        break;
+      default:
+        break;
+      }
+    }
 
     // apply low pass filter to frame channels
     cv::cvtColor(frame, frame, cv::COLOR_RGB2XYZ);
@@ -238,66 +269,73 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
 
     image_writer.update();
 
-    int keyCode = cv::waitKey(5);
-    if (keyCode >= 0) {
-      switch (keyCode) {
-      case 114: /*r*/
-        filter[0].reset(filterParams.gain(), frameChannels[0]);
-        filter[1].reset(filterParams.gain(), frameChannels[1]);
-        filter[2].reset(filterParams.gain(), frameChannels[2]);
-        break;
-      case 113: /*q*/
-        return false;
-        break;
-      case 102: /*f*/
-        showFps = !showFps;
-        break;
-      case 99: /*c*/
-        showFpsChange = !showFpsChange;
-        break;
-      case 93: /*]*/
-        filterPeriod *= 1.25f;
-        filterPeriod = std::round(filterPeriod * 10) / 10;
-        filterParams.passband(1.0 / filterPeriod);
-        std::cerr << "filter time: " << filterPeriod << " seconds." << ENDL;
-        if (verbose) {
-          std::cerr << "new filterParams: {gain: " << filterParams.gain()
-                    << ", B1: " << filterParams.B1()
-                    << ", B2: " << filterParams.B2()
-                    << ", fc: " << filterParams.passband()
-                    << ", fs: " << filterParams.samplerate() << "}" << ENDL;
+    if (!noGUI) {
+      int keyCode = cv::waitKey(5);
+      if (keyCode >= 0) {
+        switch (keyCode) {
+        case 114: /*r*/
+          filter[0].reset(filterParams.gain(), frameChannels[0]);
+          filter[1].reset(filterParams.gain(), frameChannels[1]);
+          filter[2].reset(filterParams.gain(), frameChannels[2]);
+          break;
+        case 113: /*q*/
+          return false;
+          break;
+        case 102: /*f*/
+          showFps = !showFps;
+          if (showFps) fps_printer.reset();
+          break;
+        case 99: /*c*/
+          showFpsChange = !showFpsChange;
+          break;
+        case 93: /*]*/
+          filterPeriod *= 1.25f;
+          filterPeriod = std::round(filterPeriod * 10) / 10;
+          filterParams.passband(1.0 / filterPeriod);
+          std::cerr << "filter time: " << filterPeriod << " seconds." << ENDL;
+          if (verbose) {
+            std::cerr << "new filterParams: {gain: " << filterParams.gain()
+                      << ", B1: " << filterParams.B1()
+                      << ", B2: " << filterParams.B2()
+                      << ", fc: " << filterParams.passband()
+                      << ", fs: " << filterParams.samplerate() << "}" << ENDL;
+          }
+          break;
+        case 91: /*[*/
+          filterPeriod /= 1.25f;
+          filterPeriod = std::round(filterPeriod * 10) / 10;
+          filterParams.passband(1.0 / filterPeriod);
+          std::cerr << "filter time: " << filterPeriod << " seconds." << ENDL;
+          if (verbose) {
+            std::cerr << "new filterParams: {gain: " << filterParams.gain()
+                      << ", B1: " << filterParams.B1()
+                      << ", B2: " << filterParams.B2()
+                      << ", fc: " << filterParams.passband()
+                      << ", fs: " << filterParams.samplerate() << "}" << ENDL;
+          }
+          break;
+        case 118: /*v*/
+          verbose = !verbose;
+          break;
+        case 116: /*t*/
+          writeTimestampInImage = !writeTimestampInImage;
+          break;
+        case 117: /*u*/
+          useUTCtime = !useUTCtime;
+          break;
+        case 92: /*\*/
+          flip++;
+          flip %= 4;
+          break;
+        default:
+          std::cout << "key: " << keyCode << ENDL;
+          break;
         }
-        break;
-      case 91: /*[*/
-        filterPeriod /= 1.25f;
-        filterPeriod = std::round(filterPeriod * 10) / 10;
-        filterParams.passband(1.0 / filterPeriod);
-        std::cerr << "filter time: " << filterPeriod << " seconds." << ENDL;
-        if (verbose) {
-          std::cerr << "new filterParams: {gain: " << filterParams.gain()
-                    << ", B1: " << filterParams.B1()
-                    << ", B2: " << filterParams.B2()
-                    << ", fc: " << filterParams.passband()
-                    << ", fs: " << filterParams.samplerate() << "}" << ENDL;
-        }
-        break;
-      case 118: /*v*/
-        verbose = !verbose;
-        break;
-      case 116: /*t*/
-        writeTimestampInImage = !writeTimestampInImage;
-        break;
-      case 117: /*u*/
-        useUTCtime = !useUTCtime;
-        break;
-      default:
-        std::cout << "key: " << keyCode << ENDL;
-        break;
       }
-    }
 
-    // show live and wait for a key with timeout long enough to show images
-    imshow("Live", outFrame);
+      // show live and wait for a key with timeout long enough to show images
+      imshow("Live", outFrame);
+    }
 
     return true;
   });

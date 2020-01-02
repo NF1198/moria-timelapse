@@ -15,7 +15,6 @@
 #include "IntervalTimer.h"
 #include <cmath>
 
-
 IntervalTimer::IntervalTimer(std::chrono::nanoseconds interval,
                              std::function<void(std::chrono::nanoseconds)> fn)
     : interval(interval), nextT(std::chrono::high_resolution_clock::now()),
@@ -32,5 +31,17 @@ IntervalTimer &IntervalTimer::update() {
                           std::ceil((after - nextT).count() /
                                     static_cast<float>(interval.count())))};
   }
+  return *this;
+}
+
+IntervalTimer &IntervalTimer::reset() {
+  auto before = std::chrono::high_resolution_clock::now();
+  this->fn(before - this->lastT);
+  this->lastT = before;
+  auto after = std::chrono::high_resolution_clock::now();
+  this->nextT += std::chrono::nanoseconds{
+      static_cast<long>(this->interval.count() *
+                        std::ceil((after - nextT).count() /
+                                  static_cast<float>(interval.count())))};
   return *this;
 }

@@ -29,6 +29,7 @@ public:
                 std::function<void(std::chrono::nanoseconds)> fn);
 
   IntervalTimer &update();
+  IntervalTimer &reset();
 };
 
 #endif /* AFA27D69_9611_4472_A8B5_6D7C9FC3825C */

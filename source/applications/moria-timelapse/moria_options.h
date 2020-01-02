@@ -35,6 +35,9 @@ public:
   virtual bool useUTCtime() = 0;
   virtual bool writeTimestampInImage() = 0;
   virtual bool verbose() = 0;
+  virtual u_int flip() = 0;
+  virtual bool noGUI() = 0;
+  virtual u_int decimate() = 0;
 
   virtual ~MoriaOptions();
 

@@ -74,6 +74,13 @@ MoriaOptionsBoost::MoriaOptionsBoost(int argc, char *argv[]) {
   config.add_options()("timestamp",
                        po::value<bool>(&writeTimestamp_)->default_value(true),
                        "write timestamp in frame");
+  config.add_options()(
+      "flip,f", po::value<u_int>(&flip_)->default_value(0),
+      "flip frame {0: no flip, 1: horizontal, 2: vertical, 3: both}");
+  config.add_options()("noGUI", po::bool_switch(&noGUI_), "don't show the GUI");
+  config.add_options()(
+      "decimate", po::value<u_int>(&decimate_)->default_value(1),
+      "only capture 1:N frames (useful if framerate is set by camera)");
   config.add_options()("verbose,v", po::bool_switch(&verbose_),
                        "verbose output");
 
@@ -121,7 +128,6 @@ MoriaOptionsBoost::MoriaOptionsBoost(int argc, char *argv[]) {
     print_version();
     throw exit_success();
   }
-
 }
 
 MoriaOptionsBoost::~MoriaOptionsBoost() {}
@@ -140,3 +146,6 @@ bool MoriaOptionsBoost::recordImages() { return !outDir().empty(); }
 bool MoriaOptionsBoost::useUTCtime() { return useUTC_; }
 bool MoriaOptionsBoost::writeTimestampInImage() { return writeTimestamp_; }
 bool MoriaOptionsBoost::verbose() { return verbose_; }
+u_int MoriaOptionsBoost::decimate() { return decimate_; }
+bool MoriaOptionsBoost::noGUI() { return noGUI_; }
+u_int MoriaOptionsBoost::flip() { return flip_; }
