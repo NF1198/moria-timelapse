@@ -67,6 +67,13 @@ $ moria -d 0 --width=640 --height=480 --filter-period=60 --save-interval=10 --ou
 * opencv
 * gstreamer
 
+# Building
+
+1) clone repository
+2) run ./configure
+3) resolve dependency issues, if necessary
+4) run cmake --build build
+
 # Credits 
 
 Based on <a href="https://github.com/cginternals/cmake-init/"><img src="https://raw.githubusercontent.com/cginternals/cmake-init/master/cmake-init-logo.svg?sanitize=true" width="15%"></a>
