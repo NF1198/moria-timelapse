@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <template/template-version.h>
+#include <moria-timelapse/moria-timelapse-version.h>
 
 #include <baselib/baselib.h>
 
@@ -20,7 +20,7 @@ void printInfo()
     std::cout << "========================================" << std::endl;
 
     // Library version
-    std::cout << "Version: " << TEMPLATE_VERSION << std::endl;
+    std::cout << "Version: " << MORIA_TIMELAPSE_VERSION << std::endl;
     std::cout << std::endl;
 
     // Library type (static or dynamic)

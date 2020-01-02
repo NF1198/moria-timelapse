@@ -6,7 +6,7 @@
 # find_package(THIRDPARTY REQUIRED)
 
 find_package(OpenCV REQUIRED)
-
+find_package(Boost 1.66 REQUIRED program_options)
 
 # 
 # Executable name and optionsw
@@ -18,16 +18,19 @@ set(target moria)
 # Exit here if required dependencies are not met
 message(STATUS "Moria ${target}")
 
-
 # 
 # Sources
 # 
 
 set(sources
-    main.cpp
+    util.cpp
     FPSCounter.cpp
     IntervalTimer.cpp
     CameraManager.cpp
+    moria_options_boost.cpp
+    moria_options.cpp
+    moria.cpp
+    main.cpp
 )
 
 # 
@@ -60,6 +63,7 @@ set_target_properties(${target}
 
 target_include_directories(${target}
     PRIVATE
+    /usr/local/include/opencv4
     ${DEFAULT_INCLUDE_DIRECTORIES}
     ${PROJECT_BINARY_DIR}/source/include
 )
@@ -74,6 +78,7 @@ target_link_libraries(${target}
     ${DEFAULT_LIBRARIES}
     ${META_PROJECT_NAME}::baselib
     ${OpenCV_LIBS}
+    ${Boost_LIBRARIES}
 )
 
 

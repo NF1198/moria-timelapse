@@ -12,15 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include "CameraManager.h"
+#include "moria_options.h"
 #include <iostream>
+#include <memory>
+#include <sstream>
+
+#define ENDL "\n"
 
 CameraManager::CameraManager(cv::VideoCapture &&cam) : c(std::move(cam)) {}
 
-CameraManager &CameraManager::open(int deviceId, int apiId) {
-  this->c.open(deviceId + apiId);
-  return *this;
+void CameraManager::configure(std::shared_ptr<MoriaOptions> options) {
+  if (options->gstPipeline().empty()) {
+    c.open(options->deviceID(), options->apiID());
+    c.set(cv::CAP_PROP_FRAME_WIDTH, options->frameWidth());
+    c.set(cv::CAP_PROP_FRAME_HEIGHT, options->frameHeight());
+    c.set(cv::CAP_PROP_FPS, options->captureFPS());
+  } else {
+    c.open(options->gstPipeline());
+  }
+  if (options->verbose()) {
+    int fourcc = c.get(cv::CAP_PROP_FOURCC);
+    std::cerr << "Opened camera using " << c.getBackendName() << " backend."
+              << ENDL;
+    if (options->gstPipeline().empty()) {
+      std::cerr << "Camera deviceID: " << options->deviceID() << ENDL;
+    } else {
+      std::cerr << "gstreamer pipeline: \"" << options->gstPipeline() << "\"" << ENDL;
+    }
+    std::cerr << "frame width:  " << c.get(cv::CAP_PROP_FRAME_WIDTH) << ENDL;
+    std::cerr << "frame height: " << c.get(cv::CAP_PROP_FRAME_HEIGHT) << ENDL;
+    std::cerr << "FPS:          " << c.get(cv::CAP_PROP_FPS) << ENDL;
+    if (fourcc)
+      std::cerr << "FOURCC:       " << static_cast<char>(fourcc)
+                << static_cast<char>(fourcc >> 8)
+                << static_cast<char>(fourcc >> 16)
+                << static_cast<char>(fourcc >> 24) << ENDL;
+  }
 }
 
 CameraManager &CameraManager::set(cv::VideoCaptureProperties prop,
@@ -40,9 +68,16 @@ bool CameraManager::isOpened() { return this->c.isOpened(); }
 CameraManager &
 CameraManager::with_frames(std::function<bool(cv::Mat &frame)> handler) {
   if (!this->isOpened()) {
-    return *this;
+    throw std::runtime_error("Moria: camera not open.");
   }
-  for (cv::Mat frame; handler(frame); c >> frame) {
+  for (cv::Mat frame; handler(frame);) {
+    try {
+      c >> frame;
+    } catch (const std::exception &ex) {
+      std::stringstream what("Moria: Error grabbing frame. ");
+      what << ex.what();
+      throw std::runtime_error(what.str());
+    }
   }
   return *this;
 }

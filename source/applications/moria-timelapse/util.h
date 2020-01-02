@@ -12,25 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef C34B2E44_EC72_46CD_B573_F61A40F34B0B
-#define C34B2E44_EC72_46CD_B573_F61A40F34B0B
+#ifndef C2C12748_F96F_47A6_BB0B_2B9B2AFAE223
+#define C2C12748_F96F_47A6_BB0B_2B9B2AFAE223
 
-#include <opencv2/videoio.hpp>
-#include <utility>
-#include "moria_options.h"
-#include <memory>
+void print_version();
 
-class CameraManager {
-private:
-  cv::VideoCapture c;
-
-public:
-  explicit CameraManager(cv::VideoCapture &&cam);
-  void configure(std::shared_ptr<MoriaOptions> options);
-  CameraManager &set(cv::VideoCaptureProperties prop, double value);
-  bool isOpened();
-  CameraManager &with_frames(std::function<bool(cv::Mat &frame)> handler);
-  ~CameraManager();
-};
-
-#endif /* C34B2E44_EC72_46CD_B573_F61A40F34B0B */
+#endif /* C2C12748_F96F_47A6_BB0B_2B9B2AFAE223 */

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include "butterworth_2nd_IIR_params.h"
 #include <cmath>
 #include <iostream>
@@ -26,8 +25,8 @@ Butterworth2ndOrderIIRFilterParams<T>::Butterworth2ndOrderIIRFilterParams(T pass
 
 template <typename T>
 void Butterworth2ndOrderIIRFilterParams<T>::calculate_filter_parameters() {
-  T const &fs = this->samplerate();
-  T const &fc = std::min(static_cast<T>(fs * 0.49), this->passband());
+  T const fs = this->samplerate();
+  T const fc = std::min(static_cast<T>(fs * 0.49), this->passband());
 
   // std::cerr << "passband: " << fc << ", samplerate: " << fs << "\n";
 
