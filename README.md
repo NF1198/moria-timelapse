@@ -10,6 +10,12 @@ time of arbitrary length. Images are saved at a user-defined interval independen
 
 For example, you can capture images from a camera at 15 fps, apply a filter period of 300 seconds (5 minutes) and save images every 60 seconds. The resulting images will have a virtual exposure time of 5 minutes.
 
+### Tips
+
+Filter results are limited by floating point rounding errors. Excessively high frame rates can result in 
+an unstable image due to high gain in the image filter. Run moria with the `--verbose` option to reveal
+the gain used in the filter calculation. Gains of less than 20,000 should result in relativley stable filter operation.
+
 # Usage
 
 ```
