@@ -5,7 +5,7 @@ Moria is a timelapse recording utility. This tool can also be used to capture st
 ## Theory of operation
 
 Moria applies a temporal low-pass filter to pixel data. Images are captured from the camera at a relatively higher
-frame rate, then temporally low-pass filtered. This effectively allows the photographer to choose a virtual exposure
+frame rate then temporally low-pass filtered. This effectively allows the photographer to choose a virtual exposure
 time of arbitrary length. Images are saved at a user-defined interval independent of the virtual exposure time.
 
 For example, you can capture images from a camera at 15 fps, apply a filter period of 300 seconds (5 minutes) and save images every 60 seconds. The resulting images will have a virtual exposure time of 5 minutes.
