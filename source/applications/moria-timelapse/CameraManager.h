@@ -15,10 +15,11 @@
 #ifndef C34B2E44_EC72_46CD_B573_F61A40F34B0B
 #define C34B2E44_EC72_46CD_B573_F61A40F34B0B
 
+#include "moria_options.h"
+#include <functional>
+#include <memory>
 #include <opencv2/videoio.hpp>
 #include <utility>
-#include "moria_options.h"
-#include <memory>
 
 class CameraManager {
 private:
