@@ -34,12 +34,8 @@ void CameraManager::configure(std::shared_ptr<MoriaOptions> options) {
   }
   if (options->verbose()) {
     int fourcc = c.get(cv::CAP_PROP_FOURCC);
-#ifdef CV_VERSION_MAJOR && CV_VERSION_MINOR && CV_VERSION_REVISION
-#if CV_VERSION_MAJOR == 3 && CV_VERSION_MINOR == 4 && CV_VERSION_REVISION >= 4 || CV_VERSION_MAJOR >= 4
     std::cerr << "Opened camera using " << c.getBackendName() << " backend."
               << ENDL;
-#endif
-#endif
     if (options->gstPipeline().empty()) {
       std::cerr << "Camera deviceID: " << options->deviceID() << ENDL;
     } else {

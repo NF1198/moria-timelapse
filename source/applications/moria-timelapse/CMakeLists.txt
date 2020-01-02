@@ -5,7 +5,7 @@
 
 # find_package(THIRDPARTY REQUIRED)
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4 REQUIRED)
 find_package(Boost 1.66 REQUIRED program_options)
 
 # 
