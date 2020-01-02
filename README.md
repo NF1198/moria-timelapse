@@ -70,9 +70,9 @@ $ moria -d 0 --width=640 --height=480 --filter-period=60 --save-interval=10 --ou
 # Building
 
 1) clone repository
-2) run ./configure
-3) resolve dependency issues, if necessary
-4) run cmake --build build
+2) run `./configure`
+3) resolve dependency issues
+4) run `cmake --build build`
 
 # Credits 
 
