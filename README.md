@@ -55,6 +55,12 @@ $ moria -d 0 --width=640 --height=480 --filter-period=60 --save-interval=10 --ou
 ./moria --gst "v4l2src device=/dev/video2 ! queue !  video/x-h264,width=960,height=544,framerate=30/1 ! h264parse ! avdec_h264 ! videoconvert ! appsink" --filter-period=300 --save-interval=60 --output=/tmp/moria
 ```
 
+### Example demonstrating how to make a video of recorded images (uses ffmpeg)
+
+```
+[/tmp/moria]$ cat *.jpg */*.jpg | ffmpeg -f image2pipe -r 30 -i - -vcodec libx264 -crf 25 -pix_fmt yuv420p timelapse.mp4
+```
+
 # Dependencies
 
 * cmake
