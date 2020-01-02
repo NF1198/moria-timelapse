@@ -87,7 +87,7 @@ $ moria -d 0 --width=640 --height=480 --filter-period=60 --save-interval=10 --ou
 # Dependencies
 
 * cmake
-* opencv
+* opencv >= 4
 * gstreamer
 * gstreamer plugins (good, bad, ...)
 
