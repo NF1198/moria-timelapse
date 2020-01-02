@@ -66,7 +66,7 @@ MoriaOptionsBoost::MoriaOptionsBoost(int argc, char *argv[]) {
                        "interval (seconds) at which frames are saved to disk");
   config.add_options()("filter-period",
                        po::value<float>(&filterPeriod_)->default_value(1),
-                       "virutal shutter speed (seconds)");
+                       "virtual shutter speed (seconds)");
   config.add_options()("output,O", po::value<std::string>(&outDir_),
                        "output directory");
   config.add_options()("utc", po::value<bool>(&useUTC_)->default_value(false),

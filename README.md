@@ -36,7 +36,7 @@ Configuration:
                               using gst pipeline)
   --save-interval arg (=10)   interval (seconds) at which frames are saved to 
                               disk
-  --filter-period arg (=1)    virutal shutter speed (seconds)
+  --filter-period arg (=1)    virtual shutter speed (seconds)
   -O [ --output ] arg         output directory
   --utc arg (=0)              use UTC timestamps
   --timestamp arg (=1)        write timestamp in frame
