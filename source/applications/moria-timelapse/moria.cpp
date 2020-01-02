@@ -21,6 +21,7 @@
 #include "butterworth_2nd_IIR_params.hpp"
 #include "util.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <ctime>
 #include <functional>
@@ -187,12 +188,22 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
         if (recordImages && cv::utils::fs::exists(outDir) &&
             cv::utils::fs::isDirectory(outDir)) {
           std::stringstream imgDir, imgName;
-          auto timestamp = std::time(nullptr);
+
+          auto now_chrono{std::chrono::system_clock::now()};
+          auto since_epoch{now_chrono.time_since_epoch()};
+          auto count_since_epoch = since_epoch.count();
+          auto seconds_since_epoch{(count_since_epoch / 1000000000UL) * 1000000000UL};
+          auto nanoseconds_since_epoch{count_since_epoch -
+                                            seconds_since_epoch};
+          
+          auto timestamp = std::chrono::system_clock::to_time_t(now_chrono);
           auto timestamp_to_print =
               useUTCtime ? std::gmtime(&timestamp) : std::localtime(&timestamp);
 
           imgDir << std::put_time(timestamp_to_print, "%Y-%m-%d");
           imgName << std::put_time(timestamp_to_print, "%Y-%m-%d_%H-%M-%S")
+                  << "-"
+                  << static_cast<int>(nanoseconds_since_epoch / 1.0e9 * 1000)
                   << ".jpg";
 
           auto imgOutPath = cv::utils::fs::join(outDir, imgDir.str());
@@ -218,7 +229,7 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
     } else {
       decimate_counter = decimate;
     }
-    
+
     if (frame.empty()) {
       if (verbose) {
         std::cerr << "Empty frame!\n";
@@ -283,7 +294,8 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
           break;
         case 102: /*f*/
           showFps = !showFps;
-          if (showFps) fps_printer.reset();
+          if (showFps)
+            fps_printer.reset();
           break;
         case 99: /*c*/
           showFpsChange = !showFpsChange;
