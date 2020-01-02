@@ -16,6 +16,10 @@ Filter results depend on floating point rounding errors. Excessively high frame 
 an unstable image due to high gain in the image filter. Run moria with the `--verbose` option to reveal
 the gain used in the filter calculation. Gains of less than 20,000 should result in stable filter operation.
 
+Use `v4l2-ctl --list-formats-ext --device=<>` to discover stream formats available on your camera.
+
+Use `gst-launch-1.0` to test [gstreamer](https://gstreamer.freedesktop.org/documentation/video4linux2/v4l2src.html) pipelines. 
+
 # Usage
 
 ```
@@ -63,6 +67,12 @@ $ moria -d 0 --width=640 --height=480 --filter-period=60 --save-interval=10 --ou
 ./moria --gst "v4l2src device=/dev/video2 ! queue !  video/x-h264,width=960,height=544,framerate=30/1 ! h264parse ! avdec_h264 ! videoconvert ! appsink" --filter-period=300 --save-interval=60 --output=/tmp/moria
 ```
 
+### Example using gstreamer pipeline with MJPG webcam
+
+```
+./moria --gst "v4l2src device="/dev/video0" ! image/jpeg,width=1024,height=576,framerate=30/1 ! jpegdec ! videoconvert ! appsink" --filter-period=150 --save-interval=30 --decimate=3 --output=/tmp/moria 
+```
+
 ### Example demonstrating how to make a video of recorded images (uses ffmpeg)
 
 ```
@@ -74,6 +84,7 @@ $ moria -d 0 --width=640 --height=480 --filter-period=60 --save-interval=10 --ou
 * cmake
 * opencv
 * gstreamer
+* gstreamer plugins (good, bad, ...)
 
 # Building
 
