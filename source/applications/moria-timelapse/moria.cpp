@@ -203,6 +203,7 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
           imgDir << std::put_time(timestamp_to_print, "%Y-%m-%d");
           imgName << std::put_time(timestamp_to_print, "%Y-%m-%d_%H-%M-%S")
                   << "-"
+                  << std::setw(3) << std::setfill('0')
                   << static_cast<int>(nanoseconds_since_epoch / 1.0e9 * 1000)
                   << ".jpg";
 
