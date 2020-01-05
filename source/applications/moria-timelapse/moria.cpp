@@ -192,10 +192,10 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
           auto now_chrono{std::chrono::system_clock::now()};
           auto since_epoch{now_chrono.time_since_epoch()};
           auto count_since_epoch = since_epoch.count();
-          auto seconds_since_epoch{(count_since_epoch / 1000000000UL) * 1000000000UL};
-          auto nanoseconds_since_epoch{count_since_epoch -
-                                            seconds_since_epoch};
-          
+          auto seconds_since_epoch{(count_since_epoch / 1000000000UL) *
+                                   1000000000UL};
+          auto nanoseconds_since_epoch{count_since_epoch - seconds_since_epoch};
+
           auto timestamp = std::chrono::system_clock::to_time_t(now_chrono);
           auto timestamp_to_print =
               useUTCtime ? std::gmtime(&timestamp) : std::localtime(&timestamp);
@@ -219,66 +219,64 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
       }};
 
   int empty_frames = 0;
-  int decimate_counter = decimate;
+  int decimate_counter = 0;
 
   //--- GRAB AND WRITE LOOP
   cap.with_frames([&](cv::Mat &frame) {
-    decimate_counter--;
-    if (decimate_counter > 0) {
-      return true; // continue capture
-    } else {
+    if (decimate_counter-- == 0) {
       decimate_counter = decimate;
-    }
 
-    if (frame.empty()) {
-      if (verbose) {
-        std::cerr << "Empty frame!\n";
+      if (frame.empty()) {
+        decimate_counter = 0; // ensure we capture the next valid frame
+        if (verbose) {
+          std::cerr << "Empty frame!\n";
+        }
+        empty_frames++;
+        if (empty_frames > 10) {
+          throw std::runtime_error("Moria: encountered too many empty frames.");
+        }
+        return true; // continue capture
       }
-      empty_frames++;
-      if (empty_frames > 10) {
-        throw std::runtime_error("Moria: encountered too many empty frames.");
+
+      fpscounter.update();
+      fps_printer.update();
+      fpsChangeDetector.update();
+
+      if (flip) {
+        switch (flip) {
+        case 1:
+          cv::flip(frame, frame, 1);
+          break;
+        case 2:
+          cv::flip(frame, frame, 0);
+          break;
+        case 3:
+          cv::flip(frame, frame, -1);
+          break;
+        default:
+          break;
+        }
       }
-      return true; // continue capture
-    }
 
-    fpscounter.update();
-    fps_printer.update();
-    fpsChangeDetector.update();
+      // apply low pass filter to frame channels
+      cv::cvtColor(frame, frame, cv::COLOR_RGB2XYZ);
+      frame.convertTo(floatFrame, CV_32FC3, 1.0 / 255.0);
+      cv::split(floatFrame, frameChannels);
+      filter[0].apply(filterParams, frameChannels[0]);
+      filter[1].apply(filterParams, frameChannels[1]);
+      filter[2].apply(filterParams, frameChannels[2]);
+      cv::Mat filteredlayers[] = {filter[0].value(), filter[1].value(),
+                                  filter[2].value()};
+      cv::merge(filteredlayers, 3, outFloatFrame);
+      outFloatFrame.convertTo(outFrame, CV_8UC3, 255.0);
+      cv::cvtColor(outFrame, outFrame, cv::COLOR_XYZ2RGB);
 
-    if (flip) {
-      switch (flip) {
-      case 1:
-        cv::flip(frame, frame, 1);
-        break;
-      case 2:
-        cv::flip(frame, frame, 0);
-        break;
-      case 3:
-        cv::flip(frame, frame, -1);
-        break;
-      default:
-        break;
+      if (writeTimestampInImage) {
+        imprint_timestamp(outFrame);
       }
+
+      image_writer.update();
     }
-
-    // apply low pass filter to frame channels
-    cv::cvtColor(frame, frame, cv::COLOR_RGB2XYZ);
-    frame.convertTo(floatFrame, CV_32FC3, 1.0 / 255.0);
-    cv::split(floatFrame, frameChannels);
-    filter[0].apply(filterParams, frameChannels[0]);
-    filter[1].apply(filterParams, frameChannels[1]);
-    filter[2].apply(filterParams, frameChannels[2]);
-    cv::Mat filteredlayers[] = {filter[0].value(), filter[1].value(),
-                                filter[2].value()};
-    cv::merge(filteredlayers, 3, outFloatFrame);
-    outFloatFrame.convertTo(outFrame, CV_8UC3, 255.0);
-    cv::cvtColor(outFrame, outFrame, cv::COLOR_XYZ2RGB);
-
-    if (writeTimestampInImage) {
-      imprint_timestamp(outFrame);
-    }
-
-    image_writer.update();
 
     if (!noGUI) {
       int keyCode = cv::waitKey(5);
@@ -346,7 +344,11 @@ void Moria::run(std::shared_ptr<MoriaOptions> options) {
       }
 
       // show live and wait for a key with timeout long enough to show images
-      imshow("Live", outFrame);
+      if (!outFrame.empty()) {
+        imshow("Live", outFrame);
+      } else if (verbose) {
+        std::cerr << "Moria: unable to display empty frame." << ENDL;
+      }
     }
 
     return true;
