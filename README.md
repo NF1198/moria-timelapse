@@ -83,7 +83,7 @@ $ moria -d 0 --width=640 --height=480 --filter-period=60 --save-interval=10 --ou
 ### Example demonstrating how to make a video of recorded images (uses ffmpeg)
 
 ```
-[/tmp/moria]$ cat *.jpg */*.jpg | ffmpeg -f image2pipe -r 30 -i - -vcodec libx264 -crf 25 -pix_fmt yuv420p timelapse.mp4
+cat *.jpg */*.jpg | ffmpeg -f image2pipe -r 30 -i - -vcodec libx264 -crf 25 timelapse.mp4
 ```
 
 # Dependencies
