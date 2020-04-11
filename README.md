@@ -92,6 +92,7 @@ cat *.jpg */*.jpg | ffmpeg -f image2pipe -r 30 -i - -vcodec libx264 -crf 25 time
 * opencv >= 4
 * gstreamer
 * gstreamer plugins (good, bad, ...)
+* boost-devel
 
 # Building
 
