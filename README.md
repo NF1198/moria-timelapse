@@ -22,6 +22,22 @@ Use `gst-launch-1.0` to test [gstreamer](https://gstreamer.freedesktop.org/docum
 
 If your gstreamer pipeline fails, make sure to install the appropriate gstreamer-plugin-dev libraries before building opencv. The pipelines should work after rebuildling opencv with the requisite libraries.
 
+### Other required/helpful tools
+
+To get the best experience, you should install (from your distro's package manager) or build the following projects:
+
+* https://git.ffmpeg.org/ffmpeg.git
+* https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c
+* https://git.linuxtv.org/v4l-utils.git
+* https://github.com/opencv/opencv/tree/4.3.0
+
+Note: 
+
+* Clone a repository to a specific build using: `git clone -b <tag> --depth=1 <repository>`
+* FFMPEG may need to be configured with `./configure --prefix=/usr --libdir=/usr/lib64 --pkgconfigdir=/usr/lib64/pkgconfig --incdir=/usr/include`
+* If you're building OpenCV and want to include ffmpeg, you might need to disable shared libraries or the OpenCV build will fail.
+
+
 # Usage
 
 ```
