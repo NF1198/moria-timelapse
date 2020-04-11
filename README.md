@@ -27,8 +27,8 @@ If your gstreamer pipeline fails, make sure to install the appropriate gstreamer
 To get the best experience, you should install (from your distro's package manager) or build the following projects:
 
 * https://git.ffmpeg.org/ffmpeg.git
-* https://gitlab.freedesktop.org/gstreamer/gst-libav
-* https://gstreamer.freedesktop.org/documentation/installing/on-linux.html?gi-language=c
+* https://gitlab.freedesktop.org/gstreamer
+* https://gitlab.freedesktop.org/gstreamer/gst-libav (checkout tag to match installed version of gstreamer)
 * https://git.linuxtv.org/v4l-utils.git
 * https://github.com/opencv/opencv/tree/4.3.0
 
